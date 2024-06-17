@@ -36,6 +36,8 @@ router.post('/weightRecords', Weight.weightRecords)// 获取测量体重记录
 router.post('/weightEdit', Weight.weightEdit)// 修改测量体重记录
 router.delete('/weightDel', Weight.weightDel)// 删除测量体重记录
 
+router.post('/weightByType', Weight.weightByType)// 获取月/周/日体重记录
+
 app.listen(6060, () => {
     console.log('服务器已启动,请访问http://localhost:6060/');
 })

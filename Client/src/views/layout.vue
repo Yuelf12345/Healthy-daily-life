@@ -100,8 +100,14 @@
     <el-dialog v-model="dialogVisible" title="记录体重" width="500" center>
         <el-form :model="form" label-width="auto">
             <el-form-item label="目标体重">
-                <el-input v-model="form.targetWeight" placeholder="请输入您的目标体重">
-                    <template #append>kg</template></el-input>
+                <el-input v-model="form.targetWeight" placeholder="请输入您的目标体重" :disabled="!editTargetWeight">
+                    <template #append>
+                        <div>
+                            <span>kg</span>
+                            <el-button v-if="!editTargetWeight" :icon="Edit" @click="editTargetWeight = true"
+                                style="margin-left: 1rem;" />
+                        </div>
+                    </template></el-input>
             </el-form-item>
             <el-form-item label="当前体重">
                 <el-input v-model="form.weight" placeholder="请输入您的体重">
@@ -121,8 +127,10 @@
 <script setup>
 import logo from "../assets/logo.png";
 import { storeToRefs } from 'pinia'
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, watch, computed } from 'vue';
 import router from '../router'
+import { useRoute } from 'vue-router';
+const route = useRoute();
 import { UserStore } from "../store";
 import { ElMessage } from "element-plus";
 import {
@@ -130,17 +138,14 @@ import {
 } from '@element-plus/icons-vue'
 import avatar from '../assets/avatar.webp'
 const userStore = UserStore()
-let { userInfo } = storeToRefs(userStore)
-console.log('userInfo', userInfo);
+let { userInfo, weight } = storeToRefs(userStore)
 const bgColor = ref('#fff');
 const bgColors = ['#e4ecfa', '#fff6cc', '#f0e4fa'];
 const isActive = ref(0);
 bgColor.value = bgColors[0];
-
-onMounted(() => {
-    // 打印当前路径
-    const path = router.currentRoute.value.path;
-    switch (path) {
+const currentPath = computed(() => route.path);
+watch(currentPath, (newPath) => {
+    switch (newPath) {
         case '/user':
             isActive.value = 1;
             bgColor.value = bgColors[1];
@@ -154,7 +159,7 @@ onMounted(() => {
             bgColor.value = bgColors[0];
             break;
     }
-})
+}, { immediate: true });
 
 const select = (index, path) => {
     bgColor.value = bgColors[index];
@@ -167,15 +172,19 @@ const logout = () => {
     })
 }
 
+const editTargetWeight = ref(false)
 const dialogVisible = ref(false)
 const isLoading = ref(false)
+console.log('weight', weight);
 const form = reactive({
     weight: null,
     targetWeight: null
 })
 const onRecordWeight = () => {
     form.weight = null
+    form.targetWeight = weight.value.recentWeightData[0]?.targetWeight || null
     dialogVisible.value = true
+    editTargetWeight.value = false
 }
 const submit = () => {
     isLoading.value = true
@@ -193,7 +202,7 @@ const judgeTimeOfDay = computed(() => {
         return "Good Morning";
     } else if (hour >= 12 && hour < 18) {
         return "Good Afternoon";
-    } else if ((hour >= 18 && hour < 24)||(hour >= 0 && hour < 5)) {
+    } else if ((hour >= 18 && hour < 24) || (hour >= 0 && hour < 5)) {
         return "Good Evening";
     }
 })

@@ -32,3 +32,12 @@ export function apiWeightDel(params) {
         params
     })
 }
+
+// 获取体重记录
+export function apiWeightByType(data) {
+    return request({
+        url: '/api/weightByType',
+        method: 'post',
+        data
+    })
+}

@@ -134,6 +134,43 @@ const weight = {
                 msg: '删除失败'
             }
         }
+    },
+    weightByType: async (ctx) => {
+        const { userId, type } = ctx.request.body
+        // 获取本周的体重记录
+        const startTime = new Date();
+        startTime.setHours(0, 0, 0, 0);
+        const endTime = new Date();
+        type === 'WEEK'
+            ? startTime.setDate(startTime.getDate() - 7)
+            : type === 'MONTH'
+                ? startTime.setMonth(startTime.getMonth() - 1)
+                : null;
+        let dataSql = `
+        SELECT * FROM weight 
+        WHERE userId = ?
+        AND updatedAt BETWEEN ? AND ?
+        ORDER BY updatedAt ASC
+    `;
+        console.log('startTime', type, startTime);
+        console.log('endTime', endTime);
+        const paramsForData = [userId, startTime, endTime];
+        try {
+            const [rows] = await db.query(dataSql, paramsForData);
+            ctx.body = {
+                code: 200,
+                msg: '查询成功',
+                data: {
+                    list: rows
+                },
+            };
+        } catch (error) {
+            ctx.body = {
+                code: 400,
+                success: false,
+                msg: '获取测量记录失败'
+            }
+        }
     }
 }
 module.exports = weight;

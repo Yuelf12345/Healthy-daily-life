@@ -1,6 +1,6 @@
 import { createPinia, defineStore } from 'pinia'
 import { apiLogin, apiRegister, apiUserEdit, apiUserInfo } from "../api/user";
-import { apiRecordWeight, apiWeightRecords,apiWeightEdit , apiWeightDel } from "../api/weight";
+import { apiRecordWeight, apiWeightRecords, apiWeightEdit, apiWeightDel, apiWeightByType } from "../api/weight";
 import router from '../router'
 import { ElMessage } from "element-plus";
 
@@ -20,6 +20,8 @@ export const UserStore = defineStore('user', {
             weightData: [],// 体重记录
             weightTotal: 0,
             recentWeightData: [], //最近体重记录
+            type: 'WEEK',
+            weightTypeData: [], // 月/周/日 体重
         }
     }),
     getters: {
@@ -101,11 +103,9 @@ export const UserStore = defineStore('user', {
                 targetWeight
             }
             const res = await apiRecordWeight(query).then(() => {
-                this.weightRecords()
-                this.recentWeightRecords()
+                this.refresh()
             })
             console.log('上传体重记录接口返回', res);
-
         },
         // 获取测量体重记录
         async weightRecords(query = {}) {
@@ -135,21 +135,35 @@ export const UserStore = defineStore('user', {
             console.log('获取测量体重记录接口返回', res);
             this.weight.recentWeightData = res.data.list || null
         },
+        // 修改体重记录
         async weightEdit(query) {
             const res = await apiWeightEdit(query).then(() => {
-                this.weightRecords()
-                this.recentWeightRecords()
+                this.refresh()
             })
             console.log('修改体重记录接口返回', res);
             return res
         },
+        // 删除体重记录
         async weightDel(params) {
             const res = await apiWeightDel(params).then(() => {
-                this.weightRecords()
-                this.recentWeightRecords()
+                this.refresh()
             })
             console.log('删除体重记录接口返回', res);
             return res
+        },
+        async weightByType(type) {
+            this.weight.type = type
+            try {
+                const { data: { list = [] } } = await apiWeightByType({ userId: this.userInfo.id, type: this.weight.type })
+                this.weight.weightTypeData = list || []
+            } catch (error) {
+                ElMessage.error(error)
+            }
+        },
+        refresh() {
+            this.weightRecords()
+            this.recentWeightRecords()
+            this.weightByType(this.weight.type)
         }
     }
 })

@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const checkToken = async (ctx, next) => {
     console.log('ctx.url', ctx.url);
-    if (!ctx.url.includes('/login')  && ctx.header.authorization != undefined) {
+    // 白名单
+    const whiteList = ['/login', '/register']
+    if (whiteList.includes(ctx.url) == -1 && ctx.header.authorization != undefined) {
         let token = ctx.header.authorization.replace('Bearer ', '')
         console.log('请求头是否携带token', token);
         if (token !== 'null') {

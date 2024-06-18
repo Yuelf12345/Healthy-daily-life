@@ -62,7 +62,7 @@
             <div class="main-header">
                 <div style="flex:1;display: flex;">
                     <div class="user-avatar">
-                        <el-avatar style="transform: rotate(-27deg);" :size="50" :src="avatar" />
+                        <el-avatar style="transform: rotate(-27deg);" :size="50" :src="userInfo.avatar" />
                     </div>
                     <div class="user-info">
                         <div class="user-name">

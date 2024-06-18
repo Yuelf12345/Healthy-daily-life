@@ -1,8 +1,9 @@
 const Koa = require('koa')
 const Router = require('koa-router')    //路由管理
+const static = require('koa-static')    //静态资源托管
 const { koaBody } = require('koa-body') //解析参数
 const cors = require('koa2-cors')       //cors跨域
-
+const path = require('path');
 
 const checkToken = require('./middleware/checkToken') // 校验token中间件
 const app = new Koa()
@@ -13,14 +14,16 @@ app.use(cors({
     credentials: true
 }));
 app.use(checkToken)
-app.use(koaBody())
+app.use(koaBody({
+    multipart: true, // 解析多个文件
+    formidable: {
+        uploadDir: './public/avatar', // 文件上传的临时目录
+        keepExtensions: true, // 保留文件扩展名
+    }
+}))
+app.use(static(path.join(__dirname, 'public')));
 app.use(router.routes())
 
-
-app.use((ctx, next) => {
-    ctx.body = '后台'
-    next()
-})
 
 // 用户模块
 var User = require('./api/user')        //路由模块化
@@ -28,6 +31,7 @@ router.post('/login', User.userLogin)
 router.post('/register', User.userRegister)
 router.post('/userInfo', User.userInfo)
 router.post('/userEdit', User.userEdit)
+router.post('/uploadAvatar',User.uploadAvatar)
 
 // 体重记录模块
 const Weight = require('./api/weight')

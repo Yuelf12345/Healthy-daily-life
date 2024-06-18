@@ -11,43 +11,45 @@
         format="YYYY-MM-DD HH:mm:ss"
         @change="getMainList"
       />
-      <el-button :icon="Search" type="primary" @click="onSearch" :loading="isLoading" :disabled=isLoading>搜索</el-button>
+        <el-button :icon="Search" type="primary" @click="onSearch" :loading="isLoading" :disabled=isLoading>搜索</el-button>
             </div>
         </div>
-        <el-table class="main-table" :data="weight.weightData">
-            <el-table-column prop="index" label="序号"  width="60"  align="center">
-                <template #default="{ $index }">
-                    <span>{{$index+1}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="weight" label="测量体重(kg)" align="center" width="110">
-                <template #default="{ row }">
-                    <span>{{ row.weight || '--' }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="targetWeight" label="目标体重(kg)" align="center" width="110">
-                <template #default="{ row }">
-                    <span>{{ row.targetWeight || '--' }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createdAt" label="创建时间" width="180" align="center">
-                <template #default="{ row }">
-                    <span>{{ new Date(row.createdAt).toLocaleString() }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="updatedAt" label="更新时间" width="180" align="center">
-                <template #default="{ row }">
-                    <span>{{ new Date(row.updatedAt).toLocaleString() }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="options" label="操作" width="130" align="center" fixed="right">
-                <template #default="{ row }">
-                    <el-button text size="small" type="primary" @click="onEdit(row)">编辑</el-button>
-                    <el-button text size="small" type="danger" @click="onDelete(row.weightId)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
+        <div class="body">
+            <el-table class="main-table" :data="weight.weightData">
+                <el-table-column prop="index" label="序号"  width="60"  align="center">
+                    <template #default="{ $index }">
+                        <span>{{$index+1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="weight" label="测量体重(kg)" align="center" width="110">
+                    <template #default="{ row }">
+                        <span>{{ row.weight || '--' }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="targetWeight" label="目标体重(kg)" align="center" width="110">
+                    <template #default="{ row }">
+                        <span>{{ row.targetWeight || '--' }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createdAt" label="创建时间" width="180" align="center">
+                    <template #default="{ row }">
+                        <span>{{ new Date(row.createdAt).toLocaleString() }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="updatedAt" label="更新时间" width="180" align="center">
+                    <template #default="{ row }">
+                        <span>{{ new Date(row.updatedAt).toLocaleString() }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="options" label="操作" width="130" align="center" fixed="right">
+                    <template #default="{ row }">
+                        <el-button text size="small" type="primary" @click="onEdit(row)">编辑</el-button>
+                        <el-button text size="small" type="danger" @click="onDelete(row.weightId)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <TableLineCharts class="line"/>
+        </div>
         <el-pagination
         class="pagination"
       v-model:current-page="queryForm.page"
@@ -85,6 +87,7 @@
 </template>
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
+import TableLineCharts from '../compoments/tableLineCharts.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { cloneDeep } from "lodash";
@@ -169,6 +172,18 @@ const onDelete = (weightId) => {
         gap: 2rem
     }
 
+    .body {
+        display: flex;
+        gap: 2rem;
+        .main-table {
+            width: 52vw;
+        }
+
+        .line {
+            flex: 1;
+        }
+    }
+
     .title {
         font-size: 2rem;
         font-weight: bold;
@@ -180,10 +195,7 @@ const onDelete = (weightId) => {
         width: 400px;
     }
 
-    .main-table {
-        width: 60%;
-        margin: 1rem;
-    }
+
 }
 
 .pagination {

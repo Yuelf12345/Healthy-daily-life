@@ -1,5 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const mysql = require('mysql2/promise');
+const fs = require('fs').promises;
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const uuid = () => uuidv4();
 let db;
@@ -60,6 +62,7 @@ const user = {
         const password = ctx.request.body.password;
         const gender = null;
         const age = null;
+        const avatar = `http://localhost:6060/default_avatar/avatar${Math.floor(Math.random() * 10)}.webp`;
         const createdAt = new Date();
         const updatedAt = new Date();
         try {
@@ -73,8 +76,12 @@ const user = {
                 }
                 return;
             }
-            await db.query("insert into `users` (`id`,`username`,`password`,`gender`,`age`,`createdAt`,`updatedAt`) value (?,?,?,?,?,?,?)", [
-                id, username, password, gender, age, createdAt, updatedAt
+            const insertUserSql = `
+                INSERT INTO users (id, username, password, gender, age, avatar, createdAt, updatedAt)
+                VALUES (?, ?, ?,?,?, ?, ?, ?)
+            `;
+            await db.query(insertUserSql, [
+                id, username, password, gender, age, avatar, createdAt, updatedAt
             ])
             ctx.body = {
                 code: 200,
@@ -148,6 +155,34 @@ const user = {
                 code: 400,
                 success: false,
                 msg: 'error' + error,
+            }
+        }
+    },
+    uploadAvatar: async (ctx) => {
+        const { avatar: { newFilename, filepath, mimetype } } = ctx.request.files
+        const { id } = ctx.request.body
+
+        // 指定用户id为头像文件名
+        // const newPath = path.join('./public/avatar', `${id}.${mimetype.split('/')[1]}`);
+        // const avatarPath = `http://localhost:6060/avatar/${id}.${mimetype.split('/')[1]}`
+        // await fs.rename(filepath, newPath);
+
+
+        const avatarPath = `http://localhost:6060/avatar/${newFilename}`
+        // 根据id更新用户头像
+        try {
+            const updateUserSql = "UPDATE users SET avatar = ? WHERE id = ?";
+            const updateRs = await db.query(updateUserSql, [avatarPath, id]);
+            ctx.body = {
+                code: 200,
+                success: true,
+                msg: '上传成功'
+            };
+        } catch (error) {
+            ctx.body = {
+                code: 400,
+                success: false,
+                msg: '上传失败'
             }
         }
     }

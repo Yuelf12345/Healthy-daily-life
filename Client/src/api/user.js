@@ -16,7 +16,7 @@ export function apiRegister(data) {
         data
     })
 }
-//用户信息修改接口
+//获取用户信息接口
 export function apiUserInfo(data) {
     return request({
         url: '/api/userInfo',
@@ -30,5 +30,16 @@ export function apiUserEdit(data) {
         url: '/api/userEdit',
         method: 'post',
         data
+    })
+}
+//修改用户头像接口
+export function apiUploadAvatar(data) {
+    return request({
+        url: '/api/uploadAvatar',
+        method: 'post',
+        data,
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
     })
 }

@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from 'pinia'
-import { apiLogin, apiRegister, apiUserEdit, apiUserInfo } from "../api/user";
+import { apiLogin, apiRegister, apiUserEdit, apiUserInfo, apiUploadAvatar } from "../api/user";
 import { apiRecordWeight, apiWeightRecords, apiWeightEdit, apiWeightDel, apiWeightByType } from "../api/weight";
 import router from '../router'
 import { ElMessage } from "element-plus";
@@ -12,6 +12,7 @@ export const UserStore = defineStore('user', {
             password: '',
             age: null,
             gender: null,
+            avatar: '',
             createdAt: '',
             updatedAt: '',
             token: '',
@@ -77,6 +78,13 @@ export const UserStore = defineStore('user', {
             } catch (error) {
                 console.log('修改失败:', error);
             }
+        },
+        async uploadAvatar(data) {
+            const res = await apiUploadAvatar(data).then(() => {
+                // this.userInfo.avatar = null
+                this.userGetInfo(this.userInfo.id)
+            })
+            console.log('修改头像接口返回', res);
         },
         // 退出
         async logout() {

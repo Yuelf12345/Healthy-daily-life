@@ -5,7 +5,7 @@ import { UserStore } from "../store";
 let userStore = null
 const service = axios.create({
     baseURL: '/',
-    timeout: 5000,   // 请求超时时间
+    timeout: 1000 * 60 * 60,   // 请求超时时间
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

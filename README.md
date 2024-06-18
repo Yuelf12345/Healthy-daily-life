@@ -14,6 +14,7 @@
    - password
    - gender 
    - age
+   - avatar
    - createdAt
    - updatedAt
 2. weight

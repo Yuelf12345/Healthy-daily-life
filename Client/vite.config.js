@@ -9,7 +9,7 @@ export default defineConfig({
     // open: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:6060', // 改成你node 的端口号
+        target: 'http://127.0.0.1:6060',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
